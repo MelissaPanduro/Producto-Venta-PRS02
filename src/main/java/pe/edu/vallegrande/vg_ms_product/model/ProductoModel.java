@@ -36,7 +36,7 @@ public class ProductoModel {
     private String categoria;
 
     @Column("fecha_creacion") // Mapea la columna "fecha_creacion"
-    private LocalDateTime fechaCreacion;
+    private LocalDate fechaCreacion;
 
     @Column("estado") // Mapea la columna "estado"
     private String estado; // Activo o Inactivo
