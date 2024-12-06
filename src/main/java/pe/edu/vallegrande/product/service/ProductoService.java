@@ -1,9 +1,9 @@
-package pe.edu.vallegrande.vg_ms_product.service;
+package pe.edu.vallegrande.product.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pe.edu.vallegrande.vg_ms_product.model.ProductoModel;
-import pe.edu.vallegrande.vg_ms_product.repository.ProductoRepository;
+import pe.edu.vallegrande.product.model.ProductoModel;
+import pe.edu.vallegrande.product.repository.ProductoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
