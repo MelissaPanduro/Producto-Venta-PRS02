@@ -1,6 +1,6 @@
 package pe.edu.vallegrande.vg_ms_product.repository;
 
-import java.math.BigDecimal;
+
 
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
@@ -27,13 +27,13 @@ public interface ProductoRepository extends ReactiveCrudRepository<ProductoModel
     Flux<ProductoModel> findByEstado(String estado);
 
     /**
- * Buscar productos cuyo precio unitario esté en un rango.
- * @param minPrecio precio mínimo
- * @param maxPrecio precio máximo
- * @return Flux<ProductoModel> productos dentro del rango de precios
- */
-Flux<ProductoModel> findByPrecioUnitarioBetween(BigDecimal minPrecio, BigDecimal maxPrecio);
-
+     * Buscar productos por precio unitario dentro de un rango.
+     * @param minPrecio Precio mínimo.
+     * @param maxPrecio Precio máximo.
+     * @return Flux<ProductoModel> productos en el rango de precios.
+     */
+    Flux<ProductoModel> findByPrecioUnitarioBetween(BigDecimal minPrecio, BigDecimal maxPrecio);
+}
 
     /**
      * Buscar productos cuya cantidad de paquetes sea mayor a un valor específico.

@@ -114,8 +114,8 @@ public class ProductoService {
      * @return Flux<ProductoModel> productos en el rango de precios.
      */
     public Flux<ProductoModel> buscarPorRangoDePrecios(BigDecimal minPrecio, BigDecimal maxPrecio) {
-        return productoRepository.findByPrecioKiloBetween(minPrecio, maxPrecio);
-    }
+    return productoRepository.findByPrecioUnitarioBetween(minPrecio, maxPrecio);
+}
 
     /**
      * Buscar productos por coincidencia parcial en el nombre.
