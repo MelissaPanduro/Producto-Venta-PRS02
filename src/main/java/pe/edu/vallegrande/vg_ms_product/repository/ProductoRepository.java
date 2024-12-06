@@ -1,12 +1,10 @@
 package pe.edu.vallegrande.vg_ms_product.repository;
 
-
-
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import pe.edu.vallegrande.vg_ms_product.model.ProductoModel;
 import reactor.core.publisher.Flux;
-import org.springframework.data.r2dbc.repository.Query;
+import java.math.BigDecimal;  // Importa BigDecimal aquí
 
 @Repository
 public interface ProductoRepository extends ReactiveCrudRepository<ProductoModel, Long> {
@@ -16,7 +14,6 @@ public interface ProductoRepository extends ReactiveCrudRepository<ProductoModel
      * @param descripcion descripción del producto
      * @return Flux<ProductoModel> productos que coinciden
      */
-    @Query("SELECT * FROM producto WHERE LOWER(descripcion) = LOWER(:descripcion)")
     Flux<ProductoModel> findByDescripcionIgnoreCase(String descripcion);
 
     /**
@@ -27,19 +24,12 @@ public interface ProductoRepository extends ReactiveCrudRepository<ProductoModel
     Flux<ProductoModel> findByEstado(String estado);
 
     /**
-     * Buscar productos por precio unitario dentro de un rango.
-     * @param minPrecio Precio mínimo.
-     * @param maxPrecio Precio máximo.
-     * @return Flux<ProductoModel> productos en el rango de precios.
+     * Buscar productos cuyo precio unitario esté en un rango.
+     * @param minPrecio precio mínimo
+     * @param maxPrecio precio máximo
+     * @return Flux<ProductoModel> productos dentro del rango de precios
      */
     Flux<ProductoModel> findByPrecioUnitarioBetween(BigDecimal minPrecio, BigDecimal maxPrecio);
-}
 
-    /**
-     * Buscar productos cuya cantidad de paquetes sea mayor a un valor específico.
-     * @param cantidad cantidad mínima de paquetes
-     * @return Flux<ProductoModel> productos que cumplen la condición
-     */
-    Flux<ProductoModel> findByCantidadPaqueteGreaterThan(Integer cantidad);
-
+    // Otros métodos...
 }

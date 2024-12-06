@@ -9,6 +9,7 @@ import pe.edu.vallegrande.vg_ms_product.service.ProductoService;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/productos")
 @RequiredArgsConstructor
