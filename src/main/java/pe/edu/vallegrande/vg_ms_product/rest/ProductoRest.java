@@ -1,11 +1,11 @@
-package pe.edu.vallegrande.product.rest;
+package pe.edu.vallegrande.vg_ms_product.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
-import pe.edu.vallegrande.product.model.ProductoModel;
-import pe.edu.vallegrande.product.service.ProductoService;
+import pe.edu.vallegrande.vg_ms_product.model.ProductoModel;
+import pe.edu.vallegrande.vg_ms_product.service.ProductoService;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
 
