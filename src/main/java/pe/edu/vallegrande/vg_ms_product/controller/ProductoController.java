@@ -1,10 +1,10 @@
-package pe.edu.vallegrande.product.controller;
+package pe.edu.vallegrande.vg_ms_product.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pe.edu.vallegrande.product.model.ProductoModel;
-import pe.edu.vallegrande.product.service.ProductoService;
+import pe.edu.vallegrande.vg_ms_product.model.ProductoModel;
+import pe.edu.vallegrande.vg_ms_product.service.ProductoService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

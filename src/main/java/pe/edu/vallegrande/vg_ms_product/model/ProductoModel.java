@@ -1,4 +1,4 @@
-package pe.edu.vallegrande.product.model;
+package pe.edu.vallegrande.vg_ms_product.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
