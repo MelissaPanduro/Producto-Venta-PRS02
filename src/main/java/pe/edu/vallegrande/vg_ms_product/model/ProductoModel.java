@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("producto") // Mapea la tabla "producto" de la base de datos
+@Table("productos") // Mapea la tabla "producto" de la base de datos
 public class ProductoModel {
 
     @Id
@@ -36,7 +36,7 @@ public class ProductoModel {
     private String categoria;
 
     @Column("fecha_creacion") // Mapea la columna "fecha_creacion"
-    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechaCreacinn;
 
     @Column("estado") // Mapea la columna "estado"
     private String estado; // Activo o Inactivo
