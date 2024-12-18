@@ -7,6 +7,8 @@ import pe.edu.vallegrande.vg_ms_product.model.ProductoModel;
 import pe.edu.vallegrande.vg_ms_product.service.ProductoService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import java.time.LocalDate;
+
 
 @RestController
 @RequestMapping("/api/productos")
