@@ -14,4 +14,4 @@ services:
     ports:
       - "4200:4200"
     environment:
-      API_BACKEND: https://fictional-funicular-7vrx775qp965hxw6g-8085.app.github.dev/api/productos
+      API_BACKEND: https://supreme-space-guacamole-7vrx775qpr96hr97x-8085.app.github.dev/api/productos
