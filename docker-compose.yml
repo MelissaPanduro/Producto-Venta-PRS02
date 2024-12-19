@@ -1,6 +1,6 @@
 version: '2'
 services:
   app2:
-    image: melissapanduro/prsback
+    image: melissapanduro/backendprs
     ports:
       - "8085:8085"
