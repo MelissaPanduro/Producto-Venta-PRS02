@@ -24,9 +24,8 @@ public class ProductoService {
      * @return Flux<ProductoModel> lista de productos activos.
      */
     public Flux<ProductoModel> getAllProductos() {
-        return productoRepository.findByEstado("activo");
+        return productoRepository.findAll(); // Sin filtro
     }
-
     /**
      * Obtener un producto por su ID.
      * @param id ID del producto.
