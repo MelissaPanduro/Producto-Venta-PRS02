@@ -1,0 +1,23 @@
+CREATE DATABASE PRODUCTOS;
+
+CREATE TABLE PRODUCTOS (
+    id_producto SERIAL PRIMARY KEY,               -- Identificador único generado automáticamente
+    nombre VARCHAR(100),                          -- Nombre del producto
+    descripcion TEXT,                             -- Descripción adicional
+    unidad_medida VARCHAR(50),                    -- Unidad de medida
+    precio_unitario DECIMAL(10, 2),               -- Precio por unidad de medida
+    categoria VARCHAR(50),                        -- Clasificación del producto
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Fecha de creación
+    estado VARCHAR(10) CHECK (Estado IN ('activo', 'inactivo')) -- Estado del producto
+);
+
+
+INSERT INTO PRODUCTOS (Nombre, Descripción, Unidad_Medida, Precio_Unitario, Categoría, Fecha_Creación, Estado)
+VALUES 
+    ('Huevos', 'Huevos por plancha de 30 unidades', 'Plancha', 20.50, 'Huevos', '2024-12-01 10:00:00', 'activo'),
+    ('Carne de Pollo', 'Carne fresca por kilogramo', 'Kilogramo', 15.30, 'Carnes', '2024-12-02 12:00:00', 'activo'),
+    ('Abono Orgánico', 'Saco de 50 kg de abono natural', 'Saco', 25.00, 'Abono', '2024-12-03 14:00:00', 'inactivo');
+
+SELECT * FROM PRODUCTOS;
+
+
