@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 
 @Table("product")
-public class Product {
+public class ProductoModel {
 
     @Id
     private Long id;
