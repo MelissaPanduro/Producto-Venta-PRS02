@@ -1,16 +1,17 @@
 package pe.edu.vallegrande.vg_ms_product.rest;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import pe.edu.vallegrande.vg_ms_product.model.ProductoModel;
-import pe.edu.vallegrande.vg_ms_product.service.ProductoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import pe.edu.vallegrande.SupplierNPH.model.Product;
+import pe.edu.vallegrande.SupplierNPH.service.ProductService;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
 
-RestController
+@RestController
 @RequestMapping("/NPH/products")
+@CrossOrigin(origins = "*")  // Permite solicitudes desde cualquier origen
 public class ProductRest {
 
     @Autowired
