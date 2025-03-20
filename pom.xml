@@ -13,7 +13,7 @@
     <groupId>pe.edu.vallegrande</groupId>
     <artifactId>ProductNPH</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>SupplierNPH</name>
+    <name>ProductNPH</name>
     <description>Proveedor y transaccional reactivo</description>
 
     <properties>
