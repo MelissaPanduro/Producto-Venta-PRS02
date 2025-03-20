@@ -21,3 +21,23 @@ VALUES
 SELECT * FROM PRODUCTOS;
 
 
+
+
+
+ACTUALIZACION PRODUCTO/VENTA
+
+CREATE TABLE sale (
+    id SERIAL PRIMARY KEY,
+    datesale DATE DEFAULT CURRENT_DATE,
+    name VARCHAR(255) NOT NULL,
+    ruc VARCHAR(20) NOT NULL,
+    direccion TEXT NOT NULL,
+    id_product BIGINT NOT NULL,
+    total_paquetes NUMERIC(10,2) NOT NULL,
+    sale_unitary NUMERIC(10,2) NOT NULL,
+    pricekilo NUMERIC(10,2) NOT NULL,
+    total_pagar NUMERIC(10,2) NOT NULL,
+    FOREIGN KEY (id_product) REFERENCES product(id)
+);
+
+
