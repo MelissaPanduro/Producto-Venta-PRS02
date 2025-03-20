@@ -1,45 +1,44 @@
 package pe.edu.vallegrande.vg_ms_product.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
 
-
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Table("productos") // Mapea la tabla "producto" de la base de datos
-public class ProductoModel {
+
+@Table("product")
+public class Product {
 
     @Id
-    @Column("id_producto") // Mapea la columna "id_producto"
-    private Long idProducto;
+    private Long id;
 
-    @Column("nombre") // Mapea la columna "nombre"
-    private String nombre;
+    private String type;
 
-    @Column("descripcion") // Mapea la columna "descripcion"
-    private String descripcion;
+    private String description;
 
-    @Column("unidad_medida") // Mapea la columna "unidad_medida"
-    private String unidadMedida;
+    @Column("package_weight")
+    private BigDecimal packageWeight;
 
-    @Column("precio_unitario") // Mapea la columna "precio_unitario"
-    private BigDecimal precioUnitario;
+    @Column("package_quantity")
+    private Integer packageQuantity;
 
-    @Column("categoria") // Mapea la columna "categoria"
-    private String categoria;
+    @Column("price_per_kg")
+    private BigDecimal pricePerKg;
 
-    @Column("fecha_creacion") // Mapea la columna "fecha_creacion"
-    private LocalDate fechaCreacion;
+    private Integer stock;
 
-    @Column("estado") // Mapea la columna "estado"
-    private String estado; // Activo o Inactivo
+    @Column("entry_date")
+    private LocalDate entryDate;
+
+    @Column("expiry_date")
+    private LocalDate expiryDate;
+
+    private String status = "A";
+
+    @Column("supplier_id")
+    private Long supplierId;
 }
