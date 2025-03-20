@@ -10,118 +10,53 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 
 @Service
-public class ProductoService {
-
-    private final ProductoRepository productoRepository;
+public class ProductService {
 
     @Autowired
-    public ProductoService(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
+    private ProductRepository productRepository;
+
+    public Mono<Product> createProduct(Product product) {
+        return productRepository.save(product);
     }
 
-    /**
-     * Obtener todos los productos activos.
-     * @return Flux<ProductoModel> lista de productos activos.
-     */
-    public Flux<ProductoModel> getAllProductos() {
-        return productoRepository.findAll(); // Sin filtro
-    }
-    /**
-     * Obtener un producto por su ID.
-     * @param id ID del producto.
-     * @return Mono<ProductoModel> producto encontrado o error si no existe.
-     */
-    public Mono<ProductoModel> getProductoById(Long id) {
-        return productoRepository.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Producto no encontrado con ID: " + id)));
+    public Flux<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
-    /**
-     * Crear un nuevo producto.
-     * @param producto Producto a crear.
-     * @return Mono<ProductoModel> producto creado.
-     */
-    public Mono<ProductoModel> createProducto(ProductoModel producto) {
-        return productoRepository.save(producto);
+    public Mono<Void> deleteProduct(Long id) {
+        return productRepository.deleteById(id);
     }
 
-    /**
-     * Actualizar un producto existente.
-     * @param id ID del producto a actualizar.
-     * @param producto Datos del producto actualizado.
-     * @return Mono<ProductoModel> producto actualizado.
-     */
-    public Mono<ProductoModel> updateProducto(Long id, ProductoModel producto) {
-        return productoRepository.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Producto no encontrado con ID: " + id)))
-                .flatMap(existingProducto -> {
-                    existingProducto.setNombre(producto.getNombre());
-                    existingProducto.setDescripcion(producto.getDescripcion());
-                    existingProducto.setUnidadMedida(producto.getUnidadMedida());
-                    existingProducto.setPrecioUnitario(producto.getPrecioUnitario());
-                    existingProducto.setCategoria(producto.getCategoria());
-                    existingProducto.setEstado(producto.getEstado());
-                    return productoRepository.save(existingProducto);
+
+    public Mono<Product> softDeleteProduct(Long id) {
+        return productRepository.findById(id)
+                .flatMap(product -> {
+                    product.setStatus("I"); // "I" de Inactivo (eliminado lógicamente)
+                    return productRepository.save(product);
                 });
     }
 
-    /**
-     * Eliminar un producto de forma lógica (cambiar su estado a "inactivo").
-     * @param id ID del producto a eliminar.
-     * @return Mono<ProductoModel> producto actualizado como "inactivo".
-     */
-    public Mono<ProductoModel> deleteLogicProducto(Long id) {
-        return productoRepository.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Producto no encontrado con ID: " + id)))
-                .flatMap(producto -> {
-                    producto.setEstado("inactivo");
-                    return productoRepository.save(producto);
+    public Mono<Product> restoreProduct(Long id) {
+        return productRepository.findByIdAndStatus(id, "I")
+                .flatMap(product -> {
+                    product.setStatus("A"); // "A" de Activo
+                    return productRepository.save(product);
                 });
     }
 
-    /**
-     * Restaurar un producto eliminado (cambiar su estado a "activo").
-     * @param id ID del producto a restaurar.
-     * @return Mono<ProductoModel> producto restaurado.
-     */
-    public Mono<ProductoModel> restoreProducto(Long id) {
-        return productoRepository.findById(id)
-                .switchIfEmpty(Mono.error(new RuntimeException("Producto no encontrado con ID: " + id)))
-                .flatMap(producto -> {
-                    if ("inactivo".equalsIgnoreCase(producto.getEstado())) {
-                        producto.setEstado("activo");
-                        return productoRepository.save(producto);
-                    } else {
-                        return Mono.error(new RuntimeException("El producto no está inactivo, no se puede restaurar"));
-                    }
+    public Mono<Product> updateProduct(Long id, Product productDetails) {
+        return productRepository.findById(id)
+                .flatMap(existingProduct -> {
+                    existingProduct.setType(productDetails.getType());
+                    existingProduct.setDescription(productDetails.getDescription());
+                    existingProduct.setPackageWeight(productDetails.getPackageWeight());
+                    existingProduct.setPackageQuantity(productDetails.getPackageQuantity());
+                    existingProduct.setPricePerKg(productDetails.getPricePerKg());
+                    existingProduct.setStock(productDetails.getStock());
+                    existingProduct.setEntryDate(productDetails.getEntryDate());
+                    existingProduct.setExpiryDate(productDetails.getExpiryDate());
+                    existingProduct.setSupplierId(productDetails.getSupplierId());
+                    return productRepository.save(existingProduct);
                 });
-    }
-
-    /**
-     * Buscar productos por estado.
-     * @param estado Estado del producto ("activo" o "inactivo").
-     * @return Flux<ProductoModel> productos con el estado especificado.
-     */
-    public Flux<ProductoModel> buscarPorEstado(String estado) {
-        return productoRepository.findByEstado(estado);
-    }
-
-    /**
-     * Buscar productos por rango de precios.
-     * @param minPrecio Precio mínimo.
-     * @param maxPrecio Precio máximo.
-     * @return Flux<ProductoModel> productos en el rango de precios.
-     */
-    public Flux<ProductoModel> buscarPorRangoDePrecios(BigDecimal minPrecio, BigDecimal maxPrecio) {
-    return productoRepository.findByPrecioUnitarioBetween(minPrecio, maxPrecio);
-}
-
-    /**
-     * Buscar productos por coincidencia parcial en el nombre.
-     * @param nombre Parte del nombre del producto.
-     * @return Flux<ProductoModel> productos con coincidencias.
-     */
-    public Flux<ProductoModel> buscarPorNombre(String nombre) {
-        return productoRepository.findByDescripcionIgnoreCase(nombre);
     }
 }
