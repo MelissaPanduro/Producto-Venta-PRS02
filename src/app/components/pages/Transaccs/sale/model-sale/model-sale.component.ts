@@ -15,7 +15,7 @@ import { Product } from '../../../../../../model/Product';
 })
 export class ModelSaleComponent implements OnChanges {
   @Input() isOpen: boolean = false;
-  @Input() mode: 'create' | 'edit' = 'create';
+  @Input() mode: 'create' | 'edit' | 'view' = 'create';  // Añadido modo 'view'
   @Input() saleData: Sale | null = null;
   
   @Output() closeModal = new EventEmitter<void>();
@@ -37,8 +37,21 @@ export class ModelSaleComponent implements OnChanges {
 
   ngOnChanges(): void {
     if (this.isOpen) {
-      if (this.mode === 'edit' && this.saleData) {
-        // Editar: Cargar datos existentes
+      // First, reset the form state based on mode
+      if (this.mode === 'view') {
+        // For view mode, disable the form
+        this.saleForm.disable();
+      } else {
+        // For create or edit mode, enable the form
+        this.saleForm.enable();
+        
+        // Re-disable specific fields that should always be disabled
+        this.saleForm.get('totalWeight')?.disable();
+        this.saleForm.get('totalPrice')?.disable();
+      }
+      
+      if ((this.mode === 'edit' || this.mode === 'view') && this.saleData) {
+        // Editar o Ver: Cargar datos existentes
         this.saleForm.patchValue({
           id: this.saleData.id,
           saleDate: this.formatDateForInput(this.saleData.saleDate),
@@ -52,13 +65,12 @@ export class ModelSaleComponent implements OnChanges {
           totalWeight: this.saleData.totalWeight,
           totalPrice: this.saleData.totalPrice
         });
-      } else {
+      } else if (this.mode === 'create') {
         // Crear: Limpiar formulario
         this.saleForm = this.createForm();
       }
     }
   }
-
   createForm(): FormGroup {
     return this.fb.group({
       id: [null],
@@ -100,6 +112,7 @@ export class ModelSaleComponent implements OnChanges {
       }
     }
   }
+  
   getCurrentDate(): string {
     return new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD para input type="date"
   }

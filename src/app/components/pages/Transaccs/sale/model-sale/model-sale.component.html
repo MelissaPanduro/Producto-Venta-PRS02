@@ -6,7 +6,9 @@
       <div class="bg-yellow-100 py-2 sm:py-3 px-3 sm:px-6 border-b border-gray-300 flex-shrink-0">
         <div class="flex justify-between items-center">
           <h2 class="text-base sm:text-lg md:text-xl font-bold text-gray-800">
-            {{ mode === 'create' ? 'Nueva Venta' : 'Editar Venta' }}
+            <span *ngIf="mode === 'create'">Nueva Venta</span>
+            <span *ngIf="mode === 'edit'">Editar Venta</span>
+            <span *ngIf="mode === 'view'">Detalles de Venta</span>
           </h2>
           <button (click)="handleClose()" class="text-gray-600 hover:text-gray-900 p-1">
             <i class="fas fa-times"></i>
@@ -29,7 +31,7 @@
                 formControlName="saleDate" 
                 class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
               >
-              <div *ngIf="saleForm.get('saleDate')?.touched && saleForm.get('saleDate')?.invalid" class="text-red-500 text-xs mt-0.5">
+              <div *ngIf="saleForm.get('saleDate')?.touched && saleForm.get('saleDate')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                 Fecha requerida
               </div>
             </div>
@@ -46,7 +48,7 @@
                     class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="Ingrese RUC o DNI"
                   >
-                  <div *ngIf="saleForm.get('ruc')?.touched && saleForm.get('ruc')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('ruc')?.touched && saleForm.get('ruc')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     RUC/DNI requerido
                   </div>
                 </div>
@@ -59,7 +61,7 @@
                     class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="Nombre del cliente"
                   >
-                  <div *ngIf="saleForm.get('name')?.touched && saleForm.get('name')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('name')?.touched && saleForm.get('name')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     Nombre requerido
                   </div>
                 </div>
@@ -72,7 +74,7 @@
                     class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="Dirección del cliente"
                   >
-                  <div *ngIf="saleForm.get('address')?.touched && saleForm.get('address')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('address')?.touched && saleForm.get('address')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     Dirección requerida
                   </div>
                 </div>
@@ -93,7 +95,7 @@
                     <option value="">Seleccione un producto</option>
                     <option *ngFor="let product of products" [value]="product.id">{{ product.type }}</option>
                   </select>
-                  <div *ngIf="saleForm.get('productId')?.touched && saleForm.get('productId')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('productId')?.touched && saleForm.get('productId')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     Producto requerido
                   </div>
                 </div>
@@ -108,7 +110,7 @@
                     class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="0.00"
                   >
-                  <div *ngIf="saleForm.get('weight')?.touched && saleForm.get('weight')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('weight')?.touched && saleForm.get('weight')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     Peso válido requerido
                   </div>
                 </div>
@@ -123,7 +125,7 @@
                     class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="1"
                   >
-                  <div *ngIf="saleForm.get('packages')?.touched && saleForm.get('packages')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('packages')?.touched && saleForm.get('packages')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     Cantidad requerida
                   </div>
                 </div>
@@ -137,9 +139,9 @@
                     (input)="calculateTotals()"
                     class="w-full p-1.5 sm:p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="0.00"
-                    readonly
+                    [readonly]="mode === 'view'"
                   >
-                  <div *ngIf="saleForm.get('pricePerKg')?.touched && saleForm.get('pricePerKg')?.invalid" class="text-red-500 text-xs mt-0.5">
+                  <div *ngIf="saleForm.get('pricePerKg')?.touched && saleForm.get('pricePerKg')?.invalid && mode !== 'view'" class="text-red-500 text-xs mt-0.5">
                     Precio requerido
                   </div>
                 </div>
@@ -179,7 +181,7 @@
           </div>
       
           <!-- Action buttons -->
-          <div class="mt-3 sm:mt-4 md:mt-6 flex flex-col xs:flex-row xs:justify-end gap-2 xs:gap-3">
+          <div *ngIf="mode !== 'view'" class="mt-3 sm:mt-4 md:mt-6 flex flex-col xs:flex-row xs:justify-end gap-2 xs:gap-3">
             <button 
               type="button" 
               (click)="handleClose()" 
@@ -193,6 +195,17 @@
               class="w-full xs:w-auto order-1 xs:order-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {{ mode === 'create' ? 'Guardar Venta' : 'Actualizar Venta' }}
+            </button>
+          </div>
+          
+          <!-- Solo botón de cerrar para el modo view -->
+          <div *ngIf="mode === 'view'" class="mt-3 sm:mt-4 md:mt-6 flex justify-center">
+            <button 
+              type="button" 
+              (click)="handleClose()" 
+              class="px-6 sm:px-8 py-1.5 sm:py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              Cerrar
             </button>
           </div>
         </form>

@@ -31,7 +31,7 @@ export class SaleComponent implements OnInit {
 
   // Propiedades para el modal
   isModalOpen = false;
-  modalMode: 'create' | 'edit' = 'create';
+  modalMode: 'create' | 'edit' | 'view' = 'create';  // Añadido modo 'view'
   selectedSale: Sale | null = null;
 
   constructor(
@@ -143,10 +143,14 @@ export class SaleComponent implements OnInit {
     });
   }
 
+  // Método actualizado: Ahora abre el modal en modo 'view'
   viewSaleDetails(saleId: number): void {
     const sale = this.sales.find(s => s.id === saleId);
     if (sale) {
-      console.log('Detalles de la venta:', sale);
+      // Abrimos el modal en modo vista
+      this.modalMode = 'view';
+      this.selectedSale = {...sale};
+      this.isModalOpen = true;
     }
   }
 
