@@ -35,7 +35,7 @@ export const MENU_ITEMS: Route[] = [
         path: '/Modulo-Galpon/',
         children: [
           { title: 'Kardex de huevo', path: '/Modulo-Galpon/Kardex de huevo' },
-          { title: 'Kardex de huevo', path: '/Modulo-Galpon/Kardex de huevo' },
+          { title: 'Ventas', path: '/Modulo-Galpon/Ventas' },
 
         ],
       },

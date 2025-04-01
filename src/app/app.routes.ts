@@ -83,6 +83,14 @@ export const routes: Routes = [
             (m) => m.KardexEggComponent
           ),
       },
+      {
+        path: 'Ventas',
+        title: 'Ventas',
+        loadComponent: () =>
+          import('./components/pages/Transaccs/sale/sale.component').then(
+            (m) => m.SaleComponent
+          ),
+      },
     ],
   },
 
