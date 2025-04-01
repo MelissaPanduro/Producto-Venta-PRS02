@@ -1,0 +1,78 @@
+<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 sm:p-8">
+  <div class="bg-white p-6 rounded-lg w-full max-w-md sm:max-w-lg lg:max-w-xl">
+    <h2 class="text-2xl mb-4 text-center">{{ isEdit ? 'Editar' : 'Crear' }} Movimiento Kardex</h2>
+
+    <button class="mb-4 px-4 py-2 bg-gray-300 rounded-md w-full sm:w-auto" (click)="toggleEntradaSalida()">
+      Mostrar {{ showEntrada ? 'Salida' : 'Entrada' }}
+    </button>
+
+    <form #form="ngForm" (ngSubmit)="onSubmitModal()" class="space-y-4" novalidate>
+      <div>
+        <label class="block text-sm font-medium">Fecha de Emisión</label>
+        <input type="date" [(ngModel)]="movementKardex.issueDate" name="issueDate" class="w-full p-2 border rounded-md" required #issueDate="ngModel" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Concepto</label>
+        <input type="text" [(ngModel)]="movementKardex.concept" name="concept" class="w-full p-2 border rounded-md" required #concept="ngModel" />
+        <div *ngIf="concept.invalid && concept.touched" class="text-red-500 text-sm">
+          El concepto es obligatorio.
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Tipo de Documento</label>
+          <input type="text" [(ngModel)]="movementKardex.documentType" name="documentType" class="w-full p-2 border rounded-md" required #documentType="ngModel" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium">Número de Documento</label>
+          <input type="text" [(ngModel)]="movementKardex.documentNumber" name="documentNumber" class="w-full p-2 border rounded-md" required #documentNumber="ngModel" />
+        </div>
+      </div>
+
+      <div *ngIf="showEntrada" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium">Cantidad Entrada</label>
+          <input type="number" [(ngModel)]="movementKardex.cantidadEntrada" name="cantidadEntrada" class="w-full p-2 border rounded-md" required #cantidadEntrada="ngModel" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium">Costo Unitario Entrada</label>
+          <input type="number" [(ngModel)]="movementKardex.costoUnitarioEntrada" name="costoUnitarioEntrada" class="w-full p-2 border rounded-md" required #costoUnitarioEntrada="ngModel" />
+        </div>
+        <div class="col-span-2">
+          <label class="block text-sm font-medium">Total Entrada</label>
+          <input type="text" [value]="modalValorTotalEntrada | currency" class="w-full p-2 border rounded-md bg-gray-100" disabled />
+        </div>
+      </div>
+
+      <div *ngIf="!showEntrada">
+        <label class="block text-sm font-medium">Cantidad Salida</label>
+        <input type="number" [(ngModel)]="movementKardex.cantidadSalida" name="cantidadSalida" class="w-full p-2 border rounded-md" required #cantidadSalida="ngModel" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Observación</label>
+        <input type="text" [(ngModel)]="movementKardex.observation" name="observation" class="w-full p-2 border rounded-md" required #observation="ngModel" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium">Tipo de Kardex</label>
+        <select [(ngModel)]="movementKardex.typeKardexId" name="typeKardex" class="w-full p-2 border rounded-md" required #typeKardex="ngModel">
+          <option value="" disabled selected>Seleccione un tipo</option>
+          <option *ngFor="let type of kardexTypes" [value]="type.id">{{ type.name }}</option>
+        </select>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-2">
+        <button type="button" (click)="onCancelModal()" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="form.invalid" class="px-4 py-2 bg-blue-500 text-white rounded-md disabled:bg-gray-400">
+          {{ isEdit ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

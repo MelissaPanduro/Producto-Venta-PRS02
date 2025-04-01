@@ -1,0 +1,225 @@
+
+<!-- Contenedor de Botones -->
+<div class="flex justify-between px-4 mt-6">
+    <!-- Botón Agregar Datos -->
+    <button class="flex items-center bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md wiggle-btn"  (click)="showModalForCreation()" >
+        <span class="text-xl mr-2">➕</span> Agregar Datos
+    </button>
+
+    <!-- Botones Extras -->
+    <div class="flex space-x-4">
+        <button (click)="openCreateModal()" class="extra-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md"> 📝 Crear Kardex </button> 
+        <button (click)="generatePDF()" class="extra-btn bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md"> 📄 PDF </button>
+        <button (click)="generateExcel()" class="extra-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md"> 📊 XLS </button>
+        <button class="extra-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md"> 📋 CSV </button>
+    </div>
+</div>
+
+
+<!-- Selector de Kardex en la misma línea -->
+<div class="flex items-center mt-6 px-4 space-x-2">
+    <label for="kardexSelect" class="font-bold text-lg">Seleccionar Kardex:</label>
+    <select id="kardexSelect" [(ngModel)]="selectedKardex" (change)="onKardexChange($event)" 
+        class="border border-gray-300 rounded-lg px-3 py-2 text-lg focus:ring-2 focus:ring-blue-500 focus:outline-none w-auto min-w-[150px]">
+        <option *ngFor="let kardex of kardexList" [value]="kardex.id">{{ kardex.name }}</option>
+    </select>
+
+    <!-- Botón con icono de edición de kardex -->
+    <button *ngIf="selectedKardexData" (click)="openEditModal(selectedKardexData!)"
+        class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition shadow-md">
+        <i class="fas fa-pencil-alt text-gray-700"></i>
+    </button>
+
+    <!-- Botón del calendario -->
+    <button *ngIf="selectedKardexData" (click)="toggleCalendarModal()" 
+    class="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition shadow-md">
+    <i class="fas fa-calendar-alt text-gray-700"></i>
+    </button>
+
+    <!-- Etiqueta para mostrar el filtro activo -->
+    <div *ngIf="selectedMonth && selectedYear" class="flex items-center space-x-2 bg-blue-100 px-3 py-1 rounded-lg">
+    <span class="text-sm text-blue-800">Mostrando: {{ getMonthName(selectedMonth) }} {{ selectedYear }}</span>
+    <button (click)="clearMonthFilter()" class="text-blue-600 hover:text-blue-800">
+        <i class="fas fa-times-circle"></i>
+    </button>
+    </div>
+
+    <app-creations [isOpen]="isModalOpen" [isEditMode]="isEditMode" [typeKardex]="selectedTypeKardex" (close)="closeModal()"></app-creations>
+</div>
+
+<!-- Detalle de Kardex -->
+<div class="table-container mt-6 px-4 overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-blue-500 text-white">
+            <tr>
+                <th colspan="3" class="py-3 text-xl font-bold text-center">
+                    {{ selectedKardexData?.name || 'Kardex de Venta' }}
+                </th>
+            </tr>
+            <tr class="bg-blue-300 text-black text-center">
+                <th class="py-2 px-4 border">Producto</th>
+                <th class="py-2 px-4 border">Ubicación</th>
+                <th class="py-2 px-4 border">Proveedor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="selectedKardexData" class="text-center">
+                <td class="py-2 px-4 border">{{ getProductName(selectedKardexData.productId) }}</td>
+                <td class="py-2 px-4 border">{{ getShedName(selectedKardexData.shedId) }}</td>
+                <td class="py-2 px-4 border">{{ getSupplierName(selectedKardexData.supplierId) }}</td>
+            </tr>
+        </tbody>
+        <thead class="bg-blue-300 text-black text-center">
+            <tr>
+                <th class="py-2 px-4 border">Cantidad Máxima</th>
+                <th class="py-2 px-4 border">Cantidad Mínima</th>
+                <th class="py-2 px-4 border">Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="selectedKardexData" class="text-center">
+                <td class="py-2 px-4 border">{{ selectedKardexData.maximumAmount }}</td>
+                <td class="py-2 px-4 border">{{ selectedKardexData.minimumQuantity }}</td>
+                <td class="py-2 px-4 border">{{ selectedKardexData.description }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Tabla de Movimientos con Paginador para Angular -->
+<div class="table-container mt-6 px-4 overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-300 shadow-md rounded-lg overflow-hidden">
+        <thead class="bg-blue-500 text-white">
+            <tr class="bg-blue-300 text-black text-center">
+                <th colspan="5" class="py-2 px-4 text-sm">Detalle</th>
+                <th colspan="3" class="py-2 px-4 text-sm">Entradas</th>
+                <th colspan="3" class="py-2 px-4 text-sm">Salidas</th>
+                <th colspan="3" class="py-2 px-4 text-sm">Saldo</th>
+                <th class="py-2 px-4 text-sm">Observación</th>
+                <th class="py-2 px-4 text-sm">Opciones</th>
+            </tr>
+            <tr class="bg-blue-200 text-black text-center">
+                <th class="py-2 px-4 text-sm">#</th>
+                <th class="py-2 px-4 text-sm" style="min-width: 80px; max-width: 100px;">Fecha</th>
+                <th class="py-2 px-4 text-sm">CONCEPTO</th>
+                <th class="py-2 px-4 text-sm">Doc</th>
+                <th class="py-2 px-4 text-sm">Doc N°</th>
+                <th class="py-2 px-4 text-sm">Entrada</th>
+                <th class="py-2 px-4 text-sm">Costo Unitario</th>
+                <th class="py-2 px-4 text-sm">Total</th>
+                <th class="py-2 px-4 text-sm">Salida</th>
+                <th class="py-2 px-4 text-sm">Costo Unitario</th>
+                <th class="py-2 px-4 text-sm">Total</th>
+                <th class="py-2 px-4 text-sm">Saldo</th>
+                <th class="py-2 px-4 text-sm">Costo Unitario</th>
+                <th class="py-2 px-4 text-sm">Total</th>
+                <th class="py-2 px-4 text-sm">Contexto</th>
+                <th class="py-2 px-4 text-sm">Métodos</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let movement of filteredMovements | slice:(currentPage-1)*itemsPerPage:(currentPage)*itemsPerPage; let i = index" class="text-center text-sm"
+                [ngClass]="{'bg-green-200': movement.cantidadEntrada > 0, 'bg-red-200': movement.cantidadSalida > 0}">
+                <td class="py-2 px-4 border">{{ i + 1 + (currentPage - 1) * itemsPerPage }}</td>
+                <td class="py-1 px-2 border text-xs">{{ movement.issueDate | date: 'dd/MMM/yyyy' : 'es' }}</td>
+                <td class="py-2 px-4 border">{{ movement.concept }}</td>
+                <td class="py-2 px-4 border">{{ movement.documentType }}</td>
+                <td class="py-2 px-4 border">{{ movement.documentNumber }}</td>
+                <td class="py-2 px-4 border">{{ movement.cantidadEntrada }}</td>
+                <td class="py-2 px-4 border">{{ movement.costoUnitarioEntrada }}</td>
+                <td class="py-2 px-4 border">{{ movement.valorTotalEntrada }}</td>
+                <td class="py-2 px-4 border">{{ movement.cantidadSalida }}</td>
+                <td class="py-2 px-4 border">{{ movement.costoUnitarioSalida }}</td>
+                <td class="py-2 px-4 border">{{ movement.valorTotalSalida }}</td>
+                <td class="py-2 px-4 border">{{ movement.cantidadSaldo }}</td>
+                <td class="py-2 px-4 border">{{ movement.costoUnitarioSaldo }}</td>
+                <td class="py-2 px-4 border">{{ movement.valorTotalSaldo }}</td>
+                <td class="py-2 px-4 border">{{ movement.observation }}</td>
+                <td class="py-2 px-4 border text-center">
+                    <button 
+                        class="text-blue-500 hover:text-blue-700" 
+                        (click)="showModalForEditing(movement)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+           <button 
+                class="text-red-500 hover:text-red-700 ml-2" 
+                (click)="deleteKardex(movement.kardexId)">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Paginador -->
+        <div class="flex justify-between items-center mt-4">
+            <button class="paginador-btn px-4 py-2 bg-blue-500 text-white rounded-md" 
+                    (click)="previousPage()" 
+                    [disabled]="currentPage === 1">
+                Anterior
+            </button>
+            <span>Página {{ currentPage }} de {{ totalPages }}</span>
+            <button class="paginador-btn px-4 py-2 bg-blue-500 text-white rounded-md" 
+                    (click)="nextPage()" 
+                    [disabled]="currentPage === totalPages">
+                Siguiente
+            </button>
+        </div>
+
+</div>
+
+<!-- Modal del calendario -->
+<div *ngIf="calendarModalVisible" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm sm:max-w-md md:max-w-lg transform transition-all duration-300">
+      
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold">Seleccionar Mes</h3>
+        <button (click)="toggleCalendarModal()" class="text-gray-500 hover:text-gray-700 transition-all duration-200">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      
+      <!-- Año Selector -->
+      <div class="mb-4">
+        <label for="yearSelect" class="block text-sm font-medium text-gray-700 mb-1">Año:</label>
+        <select id="yearSelect" [(ngModel)]="tempYear" class="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300">
+          <option *ngFor="let year of availableYears" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+      
+      <!-- Meses -->
+      <div class="grid grid-cols-3 gap-2 mb-4">
+        <button *ngFor="let month of months; let i = index" 
+          (click)="selectMonth(i + 1)" 
+          class="p-2 rounded-md text-center transform transition-all duration-200"
+          [ngClass]="{
+            'bg-blue-500 text-white shadow-lg hover:scale-105': tempMonth === i + 1, 
+            'bg-gray-100 hover:bg-gray-200 hover:scale-105': tempMonth !== i + 1
+          }">
+          {{ month }}
+        </button>
+      </div>
+      
+      <!-- Botones de acción -->
+      <div class="flex justify-between">
+        <button (click)="clearMonthFilter()" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transform hover:scale-105 transition-all duration-200">
+          Ver todo
+        </button>
+        <button (click)="applyMonthFilter()" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transform hover:scale-105 transition-all duration-200">
+          Aplicar
+        </button>
+      </div>
+      
+    </div>
+  </div>
+  
+
+<app-modal-kardex
+  *ngIf="modalVisible"
+  [isEdit]="editMode"
+  [movementKardex]="currentMovementKardex"
+  (closeModal)="hideModal()"
+></app-modal-kardex>

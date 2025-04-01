@@ -1,0 +1,277 @@
+<header class="bg-white shadow-md py-4">
+    <div class="w-full px-4">
+      <h1 class="text-3xl font-extrabold text-blue-900 dark:text-blue-400 md:text-4xl">
+        <span class="bg-gradient-to-r from-sky-400 to-blue-600 bg-clip-text text-transparent">
+            ➡︎ Lista de Proveedores
+        </span>
+      </h1>
+    </div>
+</header>
+
+<div class="container mx-auto my-6 p-4 bg-white shadow-md rounded-lg">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-bold">Lista de Proveedores</h2>
+        <button (click)="openModal()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-4 rounded flex items-center text-base">
+            <i class="fas fa-plus mr-2"></i> Agregar Proveedor
+        </button>
+    </div>
+
+<!-- Switcher de Estado -->
+<div class="flex items-center mb-4">
+    <span class="mr-2 font-semibold">Mostrar:</span>
+    <label class="relative inline-flex items-center cursor-pointer">
+        <input 
+            type="checkbox" 
+            class="sr-only peer" 
+            [(ngModel)]="statusActive" 
+            (ngModelChange)="toggleStatus($event)">
+        <div 
+            class="w-11 h-6 bg-red-500 peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer 
+            peer-checked:bg-green-500 
+            peer-checked:after:translate-x-5 peer-checked:after:border-white 
+            after:content-[''] after:absolute after:top-[2px] after:left-[2px] 
+            after:bg-white after:border after:rounded-full after:h-5 after:w-5 
+            after:transition-all">
+        </div>
+        <span class="ml-3 text-sm font-medium text-gray-900">
+            {{ statusActive ? 'Activos' : 'Inactivos' }}
+        </span>
+    </label>
+</div>
+<div class="overflow-x-auto">
+    <table class="w-full border-separate border-spacing-y-2 text-sm md:text-base">
+        <thead>
+            <tr class="bg-blue-100 text-blue-900 text-center">
+                <th class="px-2 py-3 font-semibold hidden md:table-cell">RUC</th>
+                <th class="px-2 py-3 font-semibold">Empresa</th>
+                <th class="px-2 py-3 font-semibold">Nombre</th>
+                <th class="px-2 py-3 font-semibold hidden lg:table-cell">Apellido</th>
+                <th class="px-2 py-3 font-semibold hidden md:table-cell">Correo</th>
+                <th class="px-2 py-3 font-semibold">Celular</th>
+                <th class="px-2 py-3 font-semibold">Tipo</th>
+                <th class="px-2 py-3 font-semibold hidden lg:table-cell">Notas</th>
+                <th class="px-2 py-3 font-semibold hidden md:table-cell">Registro</th>
+                <th class="px-2 py-3 font-semibold">Estado</th>
+                <th class="px-2 py-3 font-semibold">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let supplier of paginatedSuppliers" class="bg-gray-50 hover:bg-gray-100 text-center border-b">
+                <td class="px-2 py-3 hidden md:table-cell">{{ supplier.ruc }}</td>
+                <td class="px-2 py-3">{{ supplier.company }}</td>
+                <td class="px-2 py-3">{{ supplier.name }}</td>
+                <td class="px-2 py-3 hidden lg:table-cell">{{ supplier.lastname }}</td>
+                <td class="px-2 py-3 hidden md:table-cell whitespace-nowrap">{{ supplier.email }}</td>
+                <td class="px-2 py-3">{{ supplier.cellphone }}</td>
+                <td class="px-2 py-3">
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-1">
+                        <span>{{ getTypeSupplierInfo(supplier.typeSupplierId, 'name') }}</span>
+                    </div>
+                </td>
+                <td class="px-2 py-3 hidden lg:table-cell">{{ supplier.notes }}</td>
+                <td class="px-2 py-3 hidden md:table-cell">{{ supplier.registerDate | date: 'dd/MMM/yyyy' : 'es' }}</td>
+                <td class="px-2 py-3">
+                    <span class="inline-flex w-5 h-5 rounded-full"
+                        [ngClass]="{'bg-green-500': supplier.status === 'A', 'bg-red-500': supplier.status === 'I'}">
+                    </span>
+                </td>
+                <td class="px-2 py-3 flex justify-center space-x-2 text-lg">
+                    <button *ngIf="supplier.status === 'A'" class="text-blue-500 hover:text-blue-700" (click)="updateSupplier(supplier.id, supplier)">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button *ngIf="supplier.status === 'A'" class="text-red-500 hover:text-red-700" (click)="softDeleteSupplier(supplier.id)">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button *ngIf="supplier.status === 'I'" class="text-green-500 hover:text-green-700" (click)="restoreSupplier(supplier.id)">
+                        <i class="fas fa-undo"></i>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--Paginador-->
+<div class="flex justify-center mt-4 space-x-2">
+    <button 
+        class="px-3 py-2 bg-gray-300 rounded-md text-sm font-semibold hover:bg-gray-400 disabled:opacity-50"
+        [disabled]="currentPage === 1"
+        (click)="cambiarPagina(currentPage - 1)">
+        Anterior
+    </button>
+
+    <button 
+        *ngFor="let page of getPages()"
+        class="px-3 py-2 rounded-md text-sm font-semibold"
+        [ngClass]="{'bg-blue-500 text-white': currentPage === page, 'bg-gray-200 hover:bg-gray-300': currentPage !== page}"
+        (click)="cambiarPagina(page)">
+        {{ page }}
+    </button>
+    
+    <button 
+        class="px-3 py-2 bg-gray-300 rounded-md text-sm font-semibold hover:bg-gray-400 disabled:opacity-50"
+        [disabled]="currentPage === getPages().length"
+        (click)="cambiarPagina(currentPage + 1)">
+        Siguiente
+    </button>
+</div>
+
+<!--Modal-->
+<div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center overflow-auto bg-black bg-opacity-50">
+    <div class="bg-white rounded-lg shadow-lg w-full max-w-2xl mx-4">
+        <!-- Encabezado del modal -->
+        <div class="bg-gray-100 px-6 py-4 rounded-t-lg flex justify-between items-center">
+            <h3 class="text-xl font-semibold text-gray-800">
+                {{ selectedSupplier?.id ? 'Editar Proveedor' : 'Agregar Proveedor' }}
+            </h3>
+            <button (click)="closeModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Cuerpo del modal -->
+        <div class="p-6">
+            <form (ngSubmit)="saveSupplier()" #supplierForm="ngForm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- RUC -->
+                    <div class="mb-4">
+                        <label for="ruc" class="block text-sm font-medium text-gray-700 mb-1">RUC</label>
+                        <input 
+                            type="text" 
+                            id="ruc" 
+                            name="ruc" 
+                            [(ngModel)]="formSupplier.ruc" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Nombre de la Compañía -->
+                    <div class="mb-4">
+                        <label for="company" class="block text-sm font-medium text-gray-700 mb-1">Empresa</label>
+                        <input 
+                            type="text" 
+                            id="company" 
+                            name="company" 
+                            [(ngModel)]="formSupplier.company" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Nombre -->
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            [(ngModel)]="formSupplier.name" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Apellido -->
+                    <div class="mb-4">
+                        <label for="lastname" class="block text-sm font-medium text-gray-700 mb-1">Apellido</label>
+                        <input 
+                            type="text" 
+                            id="lastname" 
+                            name="lastname" 
+                            [(ngModel)]="formSupplier.lastname" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            [(ngModel)]="formSupplier.email" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Teléfono -->
+                    <div class="mb-4">
+                        <label for="cellphone" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                        <input 
+                            type="text" 
+                            id="cellphone" 
+                            name="cellphone" 
+                            [(ngModel)]="formSupplier.cellphone" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Fecha de Registro -->
+                    <div class="mb-4">
+                        <label for="registerDate" class="block text-sm font-medium text-gray-700 mb-1">Fecha de Registro</label>
+                        <input 
+                            type="date" 
+                            id="registerDate" 
+                            name="registerDate" 
+                            [(ngModel)]="formSupplier.registerDate" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                    </div>
+
+                    <!-- Tipo de Proveedor -->
+                    <div class="mb-4">
+                        <label for="typeSupplierId" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Proveedor</label>
+                        <select 
+                            id="typeSupplierId" 
+                            name="typeSupplierId" 
+                            [(ngModel)]="formSupplier.typeSupplierId" 
+                            required
+                            class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option [ngValue]="null" disabled>Seleccione un tipo</option>
+                            <option *ngFor="let type of typeSuppliers" [ngValue]="type.id">
+                                {{ type.name }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Notas -->
+                <div class="mb-4">
+                    <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+                    <textarea 
+                        id="notes" 
+                        name="notes" 
+                        [(ngModel)]="formSupplier.notes" 
+                        rows="3"
+                        class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    ></textarea>
+                </div>
+
+                <!-- Botones del formulario -->
+                <div class="flex justify-end mt-6 space-x-3">
+                    <button 
+                        type="button" 
+                        (click)="closeModal()" 
+                        class="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-100"
+                    >
+                        Cancelar
+                    </button>
+                    <button 
+                        type="submit" 
+                        [disabled]="supplierForm.invalid"
+                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {{ selectedSupplier?.id ? 'Actualizar' : 'Guardar' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
