@@ -6,7 +6,7 @@ import { Sale } from '../model/Sale';
   providedIn: 'root',
 })
 export class SaleService {
-  private apiUrl = 'https://ominous-space-enigma-6q6vpvrrg4qfrwx5-8085.app.github.dev/sales';
+  private apiUrl = 'https://redesigned-chainsaw-r47x557xqgp2pwr5-8085.app.github.dev/sales';
 
   constructor(private http: HttpClient) {}
 
