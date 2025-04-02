@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { ProductService } from '../../../../../service/product.service';
 import { Product } from '../../../../../model/Product';
+import { SupplierService } from '../../../../../service/supplier.service';
+import { Supplier } from '../../../../../model/Supplier';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -15,26 +17,36 @@ import Swal from 'sweetalert2';
 })
 export class ProductComponent implements OnInit {
   products: Product[] = [];
-  filteredProducts: Product[] = []; // Nueva propiedad para productos filtrados
+  filteredProducts: Product[] = [];
+  suppliers: Supplier[] = [];
   currentPage: number = 1;
   itemsPerPage: number = 5;
   totalItems: number = 0;
-  statusActive: boolean = true;
+  statusActive: boolean = true; // Por defecto muestra productos activos
   isLoading: boolean = false;
+  
+  // Modal properties
+  showModal: boolean = false;
+  editMode: boolean = false;
+  currentProduct: Product = this.getEmptyProduct();
 
-
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+    private supplierService: SupplierService
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.loadSuppliers();
   }
 
+  // Cargar todos los productos
   loadProducts(): void {
     this.isLoading = true;
     this.productService.getAll().subscribe({
       next: (data) => {
         this.products = data;
-        this.applyFilters();
+        this.applyFilters(); // Aplicar filtros al cargar datos
         this.isLoading = false;
       },
       error: (err) => {
@@ -45,8 +57,28 @@ export class ProductComponent implements OnInit {
     });
   }
 
+  // Cargar todos los proveedores
+  loadSuppliers(): void {
+    this.supplierService.getAll().subscribe({
+      next: (data) => {
+        this.suppliers = data;
+      },
+      error: (err) => {
+        console.error('Error loading suppliers:', err);
+        Swal.fire('Error', 'No se pudieron cargar los proveedores', 'error');
+      }
+    });
+  }
+
+  // Obtener el nombre de la empresa del proveedor por ID
+  getSupplierName(supplierId: number): string {
+    const supplier = this.suppliers.find(s => s.id === supplierId);
+    return supplier ? supplier.company : 'No asignado';
+  }
+
+  // Aplicar filtros según el estado seleccionado (activo/inactivo)
   applyFilters(): void {
-    // Filtramos una sola vez y guardamos los resultados
+    // Filtramos según el estado seleccionado (A = Activo, I = Inactivo)
     this.filteredProducts = this.products.filter(p => 
       this.statusActive ? p.status === 'A' : p.status === 'I'
     );
@@ -54,17 +86,20 @@ export class ProductComponent implements OnInit {
     this.currentPage = 1; // Reiniciar a la primera página al filtrar
   }
 
+  // Función para cambiar entre productos activos e inactivos (toggler)
   toggleStatus(): void {
-    this.statusActive = !this.statusActive;
-    this.applyFilters();
+    // Esta función se ejecuta cuando el usuario cambia el switcher
+    // statusActive ya se actualiza por [(ngModel)] antes de llamar a esta función
+    this.applyFilters(); // Aplicar filtros con el nuevo valor de statusActive
   }
 
+  // Obtener productos paginados para mostrar en la tabla
   get paginatedProducts(): Product[] {
-    // Usamos los productos ya filtrados
     const start = (this.currentPage - 1) * this.itemsPerPage;
     return this.filteredProducts.slice(start, start + this.itemsPerPage);
   }
 
+  // Cambiar de página en el paginador
   cambiarPagina(nuevaPagina: number): void {
     const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     if (nuevaPagina >= 1 && nuevaPagina <= totalPages) {
@@ -72,6 +107,7 @@ export class ProductComponent implements OnInit {
     }
   }
 
+  // Generar array de páginas para el paginador
   getPages(): number[] {
     if (this.totalItems === 0) return [];
     const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
@@ -110,12 +146,109 @@ export class ProductComponent implements OnInit {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
-  addProduct(): void {
-    console.log('Adding new product');
-    // Aquí puedes implementar la lógica para agregar un nuevo producto
-    // Por ejemplo, navegar a una página de formulario o abrir un modal
+  // Crear un producto vacío para el formulario
+  getEmptyProduct(): Product {
+    return {
+      id: 0, // Este campo se necesita por la interfaz Product pero será ignorado en el backend
+      type: '',
+      description: '',
+      packageWeight: 0,
+      packageQuantity: 0,
+      pricePerKg: 0,
+      stock: 0,
+      entryDate: new Date().toISOString().split('T')[0], // Fecha actual formateada para input date
+      expiryDate: '', // Vacío por defecto
+      status: 'A', // Activo por defecto
+      supplierId: null as unknown as number // Inicialmente no seleccionado
+    };
   }
 
+  // Abrir modal para agregar un nuevo producto
+  addProduct(): void {
+    this.editMode = false;
+    this.currentProduct = this.getEmptyProduct();
+    this.showModal = true;
+  }
+
+  // Abrir modal para editar o crear un producto
+  openModal(product?: Product): void {
+    if (product) {
+      // Modo edición
+      this.editMode = true;
+      // Crear una copia para no modificar directamente el objeto original
+      this.currentProduct = { ...product };
+      
+      // Formatear las fechas para el input de tipo date
+      if (this.currentProduct.entryDate) {
+        this.currentProduct.entryDate = new Date(this.currentProduct.entryDate)
+          .toISOString().split('T')[0];
+      }
+      
+      if (this.currentProduct.expiryDate) {
+        this.currentProduct.expiryDate = new Date(this.currentProduct.expiryDate)
+          .toISOString().split('T')[0];
+      }
+    } else {
+      // Modo creación
+      this.editMode = false;
+      this.currentProduct = this.getEmptyProduct();
+    }
+    
+    this.showModal = true;
+  }
+
+  // Cerrar modal
+  closeModal(): void {
+    this.showModal = false;
+  }
+
+  // Guardar producto (crear nuevo o actualizar existente)
+  saveProduct(): void {
+    this.isLoading = true;
+    
+    if (this.editMode) {
+      // Actualizar producto existente
+      this.productService.update(this.currentProduct.id, this.currentProduct).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.closeModal();
+          Swal.fire('Éxito', 'Producto actualizado correctamente', 'success');
+          this.loadProducts(); // Recargar productos
+        },
+        error: (err) => {
+          console.error('Error updating product:', err);
+          this.isLoading = false;
+          Swal.fire('Error', 'No se pudo actualizar el producto', 'error');
+        }
+      });
+    } else {
+      // Crear nuevo producto - usamos la misma estructura pero el backend ignorará el id
+      // O modificamos directamente el objeto antes de enviarlo para excluir el id
+      
+      // Opción 1: Omitir el id usando desestructuración
+      const { id, ...productWithoutId } = this.currentProduct;
+      
+      // Opción 2: Crear una copia y usar any para evitar errores de tipo
+      // const productWithoutId = { ...this.currentProduct } as any;
+      // delete productWithoutId.id;
+      
+      this.productService.create(productWithoutId as any).subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.closeModal();
+          Swal.fire('Éxito', 'Producto creado correctamente', 'success');
+          this.loadProducts(); // Recargar productos
+        },
+        error: (err) => {
+          console.error('Error creating product:', err);
+          this.isLoading = false;
+          Swal.fire('Error', 'No se pudo crear el producto', 'error');
+        }
+      });
+    }
+  }
+
+  // Eliminación lógica del producto (cambiar estado a Inactivo)
   softDeleteProduct(id: number): void {
     Swal.fire({
       title: '¿Estás seguro?',
@@ -131,8 +264,9 @@ export class ProductComponent implements OnInit {
         this.isLoading = true;
         this.productService.softDelete(id).subscribe({
           next: () => {
+            this.isLoading = false;
             Swal.fire('Eliminado', 'El producto ha sido eliminado.', 'success');
-            this.loadProducts();
+            this.loadProducts(); // Recargar productos
           },
           error: (err) => {
             console.error('Error deleting product:', err);
@@ -144,6 +278,7 @@ export class ProductComponent implements OnInit {
     });
   }
 
+  // Restaurar producto eliminado lógicamente (cambiar estado a Activo)
   restoreProduct(id: number): void {
     Swal.fire({
       title: '¿Restaurar producto?',
@@ -159,8 +294,9 @@ export class ProductComponent implements OnInit {
         this.isLoading = true;
         this.productService.restore(id).subscribe({
           next: () => {
+            this.isLoading = false;
             Swal.fire('Restaurado', 'El producto ha sido restaurado.', 'success');
-            this.loadProducts();
+            this.loadProducts(); // Recargar productos
           },
           error: (err) => {
             console.error('Error restoring product:', err);
@@ -170,10 +306,5 @@ export class ProductComponent implements OnInit {
         });
       }
     });
-  }
-
-  updateProduct(id: number, product: Product): void {
-    console.log('Edit product', id, product);
-    // Implementar lógica para editar producto
   }
 }
