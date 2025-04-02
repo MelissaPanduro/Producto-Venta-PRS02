@@ -22,6 +22,7 @@ export class ProductComponent implements OnInit {
   statusActive: boolean = true;
   isLoading: boolean = false;
 
+
   constructor(private productService: ProductService) {}
 
   ngOnInit(): void {
