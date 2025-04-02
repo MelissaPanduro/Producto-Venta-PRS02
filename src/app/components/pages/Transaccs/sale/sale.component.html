@@ -89,7 +89,7 @@
                     <td class="px-2 py-3">{{ sale.weight }}</td>
                     <td class="px-2 py-3">{{ sale.packages }}</td>
                     <td class="px-2 py-3">{{ sale.totalWeight }}</td>
-                    <td class="px-2 py-3">{{ sale.pricePerKg }}</td>
+                    <td class="px-2 py-3">S/ {{ sale.pricePerKg | number:'1.2-2' }}</td>
                     <td class="px-2 py-3">{{ sale.totalPrice }}</td>
                     <td class="px-2 py-3 flex justify-center space-x-2 text-lg">
                         <button class="text-blue-500 hover:text-blue-700" (click)="openEditModal(sale)">
