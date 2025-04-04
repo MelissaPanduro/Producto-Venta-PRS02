@@ -61,7 +61,7 @@
         <table class="w-full border-separate border-spacing-y-2 text-sm md:text-base">
             <thead>
                 <tr class="bg-blue-200 text-blue-900 text-center">
-                    <th class="px-2 py-3 font-semibold hidden md:table-cell">Carrito</th>
+                    <!--<th class="px-2 py-3 font-semibold hidden md:table-cell">Carrito</th>-->
                     <th class="px-2 py-3 font-semibold">Fecha de Venta</th>
                     <th class="px-2 py-3 font-semibold">Nombre</th>
                     <th class="px-2 py-3 font-semibold hidden md:table-cell">RUC</th>
@@ -77,10 +77,10 @@
             </thead>
             <tbody>
                 <tr *ngFor="let sale of paginatedSales" class="bg-white hover:bg-blue-50 text-center border-b">
-                    <td class="px-2 py-3 hidden md:table-cell flex items-center justify-center space-x-2">
+                    <!--<td class="px-2 py-3 hidden md:table-cell flex items-center justify-center space-x-2">
                         <i class="fas fa-shopping-cart text-xl text-green-500"></i>
                         <span class="text-blue-600 ml-2">{{ sale.id }}</span>
-                    </td>
+                    </td>-->
                     <td class="px-2 py-3">{{ sale.saleDate | date:'dd/MMM/yyyy' }}</td>
                     <td class="px-2 py-3">{{ sale.name }}</td>
                     <td class="px-2 py-3 hidden md:table-cell">{{ sale.ruc }}</td>

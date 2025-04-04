@@ -7,7 +7,7 @@ import { Product } from '../model/Product';
   providedIn: 'root',
 })
 export class ProductService {
-  private baseUrl = 'https://glorious-yodel-rq97x7rrgj7hrwq-8085.app.github.dev/NPH/products';
+  private baseUrl = 'https://redesigned-chainsaw-r47x557xqgp2pwr5-8085.app.github.dev/NPH/products';
 
   constructor(private http: HttpClient) {}
 
